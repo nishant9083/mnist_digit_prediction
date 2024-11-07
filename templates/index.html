@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digit Prediction</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        text-align: center;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      .file-input {
+        margin-bottom: 20px;
+      }
+      #predict-btn {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      #predict-btn:hover {
+        background-color: #0056b3;
+      }
+      #output {
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Digit Prediction</h1>
+      <input type="file" id="file-input" class="file-input" accept="image/*" />
+      <button id="predict-btn">Predict</button>
+      <div id="output" class="hidden">
+        Prediction: <span id="prediction"></span>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("predict-btn")
+        .addEventListener("click", async () => {
+          const fileInput = document.getElementById("file-input");
+          const output = document.getElementById("output");
+          const predictionText = document.getElementById("prediction");
+
+          if (!fileInput.files[0]) {
+            alert("Please upload an image file.");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("file", fileInput.files[0]);
+
+          // Send request to the prediction API
+          try {
+            const response = await fetch("/predict", {
+              method: "POST",
+              body: formData,
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+              predictionText.innerText = data.prediction;
+              output.classList.remove("hidden");
+            } else {
+              alert(data.error || "An error occurred. Please try again.");
+            }
+          } catch (error) {
+            alert("Error: " + error.message);
+          }
+        });
+    </script>
+  </body>
+</html>
